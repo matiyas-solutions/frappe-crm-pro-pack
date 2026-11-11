@@ -120,7 +120,7 @@ def _fields():
 
 def count(definition):
 	filters = build_filters(definition)
-	rows = frappe.get_list(LEAD, filters=filters, fields=["count(name) as c"])
+	rows = frappe.get_list(LEAD, filters=filters, fields=[{"COUNT": "name", "as": "c"}])
 	return cint(rows[0].c) if rows else 0
 
 

@@ -448,7 +448,7 @@ def _counts(form=None, since=None):
 	flt_ = {"form": form} if form else {}
 	if since:
 		flt_["creation"] = [">=", since]
-	rows = frappe.get_all(ENTRY, filters=flt_, fields=["result", "count(name) as n"], group_by="result")
+	rows = frappe.get_all(ENTRY, filters=flt_, fields=["result", {"COUNT": "name", "as": "n"}], group_by="result")
 	out = {"Created": 0, "Duplicate": 0, "Blocked": 0, "Failed": 0}
 	out.update({r.result: r.n for r in rows})
 	return out
@@ -573,7 +573,7 @@ def list_entries(form=None, result=None, search=None, from_date=None, to_date=No
 	titles = {r.name: r.title for r in frappe.get_all(FORM, fields=["name", "title"], limit_page_length=300)}
 	for r in rows:
 		r["form_title"] = titles.get(r["form"], r["form"])
-	total = cint(frappe.get_all(ENTRY, fields=["count(name) as n"], filters=filters, or_filters=or_filters)[0].n)
+	total = cint(frappe.get_all(ENTRY, fields=[{"COUNT": "name", "as": "n"}], filters=filters, or_filters=or_filters)[0].n)
 	return {"rows": rows, "total": total, "page": cint(page), "page_size": size}
 
 

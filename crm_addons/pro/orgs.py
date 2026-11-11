@@ -27,7 +27,7 @@ def _counts(names):
 	if not names:
 		return out
 	for dt, key in (("CRM Lead", "leads"), ("CRM Deal", "deals")):
-		for r in frappe.get_list(dt, filters={"organization": ["in", names]}, fields=["organization", "count(name) as n"], group_by="organization", limit_page_length=0):
+		for r in frappe.get_list(dt, filters={"organization": ["in", names]}, fields=["organization", {"COUNT": "name", "as": "n"}], group_by="organization", limit_page_length=0):
 			out[r.organization][key] = r.n
 	return out
 
@@ -60,7 +60,7 @@ def list_orgs(search=None, industry=None, territory=None, no_of_employees=None, 
 	col = order_by if order_by in SORTS else "organization_name"
 	direction = "desc" if cstr(order_dir).lower() == "desc" else "asc"
 	rows = frappe.get_list(ORG, fields=FIELDS, filters=flt, or_filters=or_flt, order_by=f"{col} {direction}", limit_start=max(0, cint(start)), limit_page_length=max(1, min(cint(page_length) or 25, 200)))
-	total = cint((frappe.get_list(ORG, fields=["count(name) as n"], filters=flt, or_filters=or_flt) or [{"n": 0}])[0]["n"])
+	total = cint((frappe.get_list(ORG, fields=[{"COUNT": "name", "as": "n"}], filters=flt, or_filters=or_flt) or [{"n": 0}])[0]["n"])
 	counts = _counts([r.name for r in rows])
 	for r in rows:
 		r.update(counts[r.name])
