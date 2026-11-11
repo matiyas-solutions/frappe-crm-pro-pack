@@ -1,8 +1,8 @@
 # Metadata for bench and linters. The package itself is built from setup.py.
 
 [tool.bench.frappe-dependencies]
-# Developed and tested on Frappe v15 with Frappe CRM 1.x. Every Frappe API it uses also exists on v16 and
-# develop, so newer versions are allowed but have not been tested.
+# Targets Frappe v16 with Frappe CRM 1.x. Queries use the dict syntax for SQL functions
+# (e.g. {"COUNT": "name", "as": "n"}), which v16's query engine requires. Not re-tested on v15.
 frappe = ">=15.0.0,<18.0.0"
 
 [tool.ruff]
