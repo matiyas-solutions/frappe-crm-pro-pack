@@ -530,7 +530,7 @@ def _worked_filters(scope, owner, reference_doctype, search, outcome):
 
 
 def _count(filters, or_filters):
-	rows = frappe.get_list(DOCTYPE, filters=filters, or_filters=or_filters or None, fields=["count(name) as n"])
+	rows = frappe.get_list(DOCTYPE, filters=filters, or_filters=or_filters or None, fields=[{"COUNT": "name", "as": "n"}])
 	return cint(rows[0]["n"]) if rows else 0
 
 
@@ -615,7 +615,7 @@ def get_workspace(
 		base = [f for f in shared if not (f[0] == "assigned_to")]
 		for row in frappe.get_list(
 			DOCTYPE, filters=base + [["next_closed", "=", 0]], or_filters=any_of or None,
-			fields=["assigned_to", "count(name) as n"], group_by="assigned_to", order_by="n desc",
+			fields=["assigned_to", {"COUNT": "name", "as": "n"}], group_by="assigned_to",
 		):
 			if row.assigned_to:
 				owners.append({"name": row.assigned_to, "full_name": user_details(row.assigned_to)[1] or row.assigned_to, "open": cint(row.n)})

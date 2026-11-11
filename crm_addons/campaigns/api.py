@@ -205,7 +205,7 @@ def list_campaigns(search=None, status=None, start=0, page_length=20, channel=No
 			r["audience"] = _audience_label(r, views)
 			r["created_by"] = people.get(r.campaign_owner or r.owner) or r.campaign_owner or r.owner
 			r.pop("selected_records", None)
-	total = frappe.get_list(CAMPAIGN, filters=filters, or_filters=or_filters, fields=["count(name) as c"])
+	total = frappe.get_list(CAMPAIGN, filters=filters, or_filters=or_filters, fields=[{"COUNT": "name", "as": "c"}])
 	return {"rows": rows, "total": cint(total[0].c) if total else 0}
 
 

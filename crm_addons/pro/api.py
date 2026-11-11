@@ -171,9 +171,9 @@ def list_notifications(show="all", type=None, search=None, start=0, page_length=
 			"quote": (strip_html(cstr(r.message))[:200] if r.notification_text and r.message and strip_html(cstr(r.message)) != strip_html(cstr(r.notification_text)) else ""),
 			"reference_doctype": r.reference_doctype, "reference_name": r.reference_name, "title": title,
 		})
-	total = cint(frappe.db.count(NOTIFICATION, filters)) if not or_filters else cint(frappe.get_all(NOTIFICATION, fields=["count(name) as n"], filters=filters, or_filters=or_filters)[0].n)
+	total = cint(frappe.db.count(NOTIFICATION, filters)) if not or_filters else cint(frappe.get_all(NOTIFICATION, fields=[{"COUNT": "name", "as": "n"}], filters=filters, or_filters=or_filters)[0].n)
 	mine = {"to_user": frappe.session.user}
-	by_type = {t.type: cint(t.n) for t in frappe.get_all(NOTIFICATION, filters=mine, fields=["type", "count(name) as n"], group_by="type")}
+	by_type = {t.type: cint(t.n) for t in frappe.get_all(NOTIFICATION, filters=mine, fields=["type", {"COUNT": "name", "as": "n"}], group_by="type")}
 	return {"rows": out, "total": total, "unread": unread_count(), "counts": {"all": sum(by_type.values()), "by_type": by_type}}
 
 

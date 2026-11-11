@@ -103,7 +103,7 @@ def _get_list(**kw):
 
 def _count(**kw):
 	"""How many leads match: counted by the database (get_list still applies the person's permissions), not by loading every name."""
-	rows = _get_list(fields=["count(name) as n"], **kw)
+	rows = _get_list(fields=[{"COUNT": "name", "as": "n"}], **kw)
 	return cint(rows[0].n) if rows else 0
 
 
@@ -328,8 +328,9 @@ def field_values(fieldname, txt="", limit=40):
 	flt = [[LEAD, "converted", "=", 0], [LEAD, fieldname, "is", "set"]]
 	if txt:
 		flt.append([LEAD, fieldname, "like", f"%{txt}%"])
-	rows = frappe.get_list(LEAD, filters=flt, fields=[fieldname, "count(name) as n"], group_by=fieldname, order_by="n desc", limit_page_length=max(1, min(cint(limit) or 40, 100)))
-	return [{"value": r.get(fieldname), "count": r.n} for r in rows]
+	rows = frappe.get_list(LEAD, filters=flt, fields=[fieldname, {"COUNT": "name", "as": "n"}], group_by=fieldname, limit_page_length=0)
+	rows = sorted(rows, key=lambda r: -cint(r.n))[:max(1, min(cint(limit) or 40, 100))]
+	return [{"value": r.get(fieldname), "count": cint(r.n)} for r in rows]
 
 
 @frappe.whitelist()

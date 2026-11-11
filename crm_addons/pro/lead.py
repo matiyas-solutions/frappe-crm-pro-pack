@@ -121,7 +121,8 @@ def delete_note(name, note):
 @frappe.whitelist()
 def get_tasks(name):
 	_lead(name)
-	rows = frappe.get_list("CRM Task", filters={"reference_doctype": LEAD, "reference_docname": name}, fields=["name", "title", "description", "status", "priority", "due_date", "assigned_to", "creation"], order_by="due_date is null, due_date asc, creation desc", limit_page_length=200)
+	rows = frappe.get_list("CRM Task", filters={"reference_doctype": LEAD, "reference_docname": name}, fields=["name", "title", "description", "status", "priority", "due_date", "assigned_to", "creation"], order_by="due_date asc, creation desc", limit_page_length=200)
+	rows.sort(key=lambda r: r.due_date is None)  # stable: undated tasks last
 	for r in rows:
 		r["assignee"] = _person(r.assigned_to)
 	return rows
